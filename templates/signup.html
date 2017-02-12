@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Blog Portal!</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+        <style>
+           
+            h1, h2, h3, h4, textarea, .main-title, .blogpost, .content-body, label {
+                font-family: 'Ubuntu', sans-serif;
+                color: white;
+            }
+            textarea {
+                width: 650px !important;
+                height: 350px !important;
+            }
+            .main-title {
+                text-align: center;
+                font-size: 3.5em;
+            }
+            body{
+                background: #ee0979; /* fallback for old browsers */
+                background: -webkit-linear-gradient(to left, #ee0979 , #ff6a00); /* Chrome 10-25, Safari 5.1-6 */
+                background: linear-gradient(to left, #ee0979 , #ff6a00); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */    
+            }
+            .content-body {
+                font-size: 1.3em;
+            }
+            label {
+                font-size: 1.3em;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container" >
+            <div class="main-title">Blog Portal</div>
+            <hr style="height:30px; color:white;">
+            <br>
+            <div class="centered">
+            
+            </div>
+           <form method="post" class="form-horizontal">
+                    <div class="form-group centered">
+                        <div><h2>Sign Up</h2></div>
+                        <br>
+                        <label>
+                            Username  <input type="text" name="username" class="form-control" placeholder="Username" value="{{ name }}">
+                        </label>
+                        <br><br>
+                        <label>
+                            Password  <input type="password" name="password"class="form-control" placeholder="Password">
+                        </label>
+                        <br><br>
+                        <label>
+                            Verify Password  <input type="password" name="verify"class="form-control" placeholder="Verify Password">
+                        </label>
+                        <br><br>
+                        <label>
+                            Email(Optional)  <input type="email" name="email"class="form-control" placeholder="Email" value="{{ email }}">
+                        </label>
+                        <!-- Error Area -->
+                        {% if error %}
+                        <div class="error alert alert-danger">
+                            {{ error }}
+                        </div>
+                        {% endif %}
+                        <br>
+                        <input type="submit" value="Sign Up" class="btn btn-default btn-signup">
+                    </div>
+                </form>
+        </div>
+    </body>
+</html>

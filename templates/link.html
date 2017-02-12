@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Blog Portal!</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+        <style>
+           
+            h1, h2, h3, h4, textarea, .main-title, .post-display, .post-content {
+                font-family: 'Ubuntu', sans-serif;
+                color: white;
+            }
+            textarea {
+                width: 650px !important;
+                height: 100px !important;
+            }
+            .main-title {
+                text-align: center;
+                font-size: 3.5em;
+            }
+            body{
+                background: #ee0979; /* fallback for old browsers */
+                background: -webkit-linear-gradient(to left, #ee0979 , #ff6a00); /* Chrome 10-25, Safari 5.1-6 */
+                background: linear-gradient(to left, #ee0979 , #ff6a00); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */    
+            }
+            .post-content {
+                font-size: 1.3em;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <div class="container" >
+            <div class="main-title">Blog Portal</div>
+            <hr>
+            <br>
+            <div class="post-display">
+                <h2>{{ post.subject }}</h2>
+                <hr>
+                <div class="post-content">
+                    {{ post.content }}
+                </div>
+                <br><h4>
+                {%if post.comments %}
+                <i>Comments</i> : <br><br>
+                    {% for comment in post.comments %} 
+                        &nbsp;&nbsp;&#8226; {{ comment }}
+                        <br>
+                    {% endfor %}
+                {% endif %}
+                </h4>
+                <br>
+            </div>
+                <form method="post">
+                    <div class="form-group">
+                        <label>
+                        <div><h4>Enter your comment</h4></div>
+                            <textarea name="content" class="form-control" placeholder="Enter your comment"></textarea>
+                        </label>
+                        <br>
+                        <!-- Error Area -->
+                        {% if error %}
+                        <br>
+                        <div class="error alert alert-danger">
+                            {{ error }}
+                        </div>
+                        {% endif %}
+                        <input type="submit" value="Submit" class="btn btn-default">
+                        <button class="btn btn-default"><a href="/">Cancel</a></button>
+                    </div>
+                </form>
+                
+            <hr>
+        </div>
+    </body>
+</html>
