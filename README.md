@@ -2,9 +2,10 @@
 - Project 3  under the Full Stack Web Developer Nanodegree at Udacity
 
 ### Details
-- This is a multiuser supporting blog website
+- This is a multiuser supporting blogging website
 - Backend is based on python
 - App deployed using Google App Engine
+- Bootstrap framework is used for the front-end
 
 ### Features
 - Multiple Users can sign up, login, logout
