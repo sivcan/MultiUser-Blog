@@ -195,7 +195,7 @@ class Post(db.Model):
     
     def render(self, user):
         self._render_text = self.content.replace('\n', '<br>')
-        return render_str("blogpost.html", p=self, user=user)
+        return render_str("home.html", p=self, user=user)
 
 def blog_key(name='default'):
     return db.Key.from_path('blogs', name)
@@ -252,7 +252,7 @@ class PostPage(BlogHandler):
             self.error(404)
             self.render("404.html")
         else:
-            self.render("link.html", post=post)
+            self.render("link.html", post=post, user=self.user)
         
     def post(self, post_id):
         if not self.user:
@@ -294,13 +294,103 @@ class DeletePost(BlogHandler):
         post.delete()
         self.redirect('/blog')
         
+class EditPost(BlogHandler):
+    def get(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key()) 
+        post = db.get(key)
+        
+        if not post:
+            self.render('404.html')
+        else :
+            self.render('newpost.html', post=post)
+            
+    def post(self, post_id):
+        if not self.user:
+            return self.redirect('/blog')
 
+        subject = self.request.get('subject')
+        content = self.request.get('content')
+        
+        if subject and content:
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
+            post.subject = subject
+            post.content = content
+            post.put()
+            return self.redirect('/blog/%s' % post_id)
+        else:
+            error = "Enter the subject and content, please!"
+            self.render("newpost.html", subject=subject, content=content, error=error)
+
+class EditComment(BlogHandler):
+    def get(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        comment = self.request.get('comment')
+        if not post:
+            return self.render('404.html')
+        else :
+            self.render('editcomment.html', post=post, comment=comment)
+    
+    def post(self, post_id):
+        if not self.user:
+            self.redirect('/blog/%s' % post_id)
+        
+        old_comment = self.request.get('old_comment')
+        comment = self.request.get('new_comment')
+        if comment and old_comment:
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
+            post.comments = [words.replace(old_comment, comment) for words in post.comments]
+            post.put()
+            
+            user = User.by_name(self.user.name)
+            user.user_comments = [words.replace(old_comment, comment) for words in user.user_comments]
+            user.put()
+            
+            self.redirect('/blog/%s' % post_id)
+        else :
+            self.redirect('/blog/%s' % post_id)
+            
+        
+class DeleteComment(BlogHandler):
+    def get(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        comment = self.request.get('comment')
+        if not post:
+            self.render('404.html')
+        else :
+            self.render('deletecomment.html', post=post, comment=comment)
+    
+    def post(self, post_id):
+        if not self.user:
+            self.redirect('/blog/%s' % post_id)
+        
+        old_comment = self.request.get('old_comment')
+        if old_comment :
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
+            try :
+                post.comments.remove(old_comment)
+                post.put()
+                
+                user = User.by_name(self.user.name)
+                user.user_comments.remove(old_comment)
+                user.put()
+            except :
+                self.redirect('/blog/%s' % post_id)
+        self.redirect('/blog/%s' % post_id)
+        
 app = webapp2.WSGIApplication([
     ('/', HomeHandler),
     ('/blog/?', HomeHandler),
     ('/blog/newpost', NewPost),
     ('/blog/(\d+)', PostPage),
+    ('/blog/edit/(\d+)', EditPost),
     ('/blog/delete/(\d+)', DeletePost),
+    ('/comment/edit/(\d+)', EditComment),
+    ('/comment/delete/(\w+)', DeleteComment),
     ('/signup', Register),
     ('/login', Login),
     ('/logout', Logout)

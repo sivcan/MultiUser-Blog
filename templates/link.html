@@ -12,6 +12,13 @@
                 <i>Comments</i> : <br><br>
                     {% for comment in post.comments %} 
                         &nbsp;&nbsp;&#8226; {{ comment }}
+                        {% if comment in user.user_comments %}
+                        &nbsp;&nbsp;
+                    <div class="btn-group">
+                        <button class="btn btn-primary btn-xs"><a href="/comment/edit/{{ post.key().id() }}?comment={{ comment }}">Edit</a></button>&nbsp;
+                        <button class="btn btn-danger btn-xs"><a href="/comment/delete/{{ post.key().id() }}?comment={{ comment }}">Delete</a></button>
+                    </div>
+                        {% endif %}
                         <br>
                     {% endfor %}
                 {% endif %}

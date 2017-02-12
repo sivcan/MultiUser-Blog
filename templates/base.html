@@ -43,25 +43,26 @@
         </style>
     </head>
     <body>
-        <div class="container" >
-            <div class="main-title">
-                <a href="/blog">Blog Portal</a>
+    <div class="container" >
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">Blog Portal</a>
             </div>
-            <hr style="height:30px; color:white;">
-            <br>
-            <div class="login-area">
-            <a class="login-link" href="/">Home</a> |
-            {% if user %}
-            <a class="login-link" href="/blog/newpost">Create a New Post</a> | {{ user.name }} (
-            <a class="login-link" href="/logout">logout</a>)
-        {% else %}
-            <a class="login-link" href="/blog/newpost">Create a New Post</a>
-                |
-            <a class="login-link" href="/login">login</a>
-            |
-                <a class="login-link" href="/signup">signup</a>
-        {% endif %}
-            </div>
+            <ul class="nav navbar-nav navbar-right">
+            <li class="active "><a href="/">Home</a></li>
+                {% if user %}
+                <li><a href="/">Hi, {{ user.name }}!</a></li>
+                <li><a href="/blog/newpost">New Post</a></li>
+                <li><a href="/logout">Logout</a></li>
+                {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/signup">Sign Up</a></li>
+                {% endif %}
+                </ul>
+                </div>
+        </nav>
+
         <div id="blockcontent">
             {% block content %}
             {% endblock %}

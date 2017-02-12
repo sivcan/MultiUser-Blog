@@ -1,4 +1,11 @@
 {% extends "base.html" %}
+
 {% block content %}
-            The user is : {{ user }}
+    {% for p in posts %}
+        {{ p.render( user ) | safe }}
+        <br><br>
+    {% endfor %}
 {% endblock %}
+
+
+
