@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
         <style>
            
-            h1, h2, h3, h4, textarea, .main-title, .blogpost, .content-body, label {
+            h1, h2, h3, h4, textarea, .main-title, .blogpost, .content-body, .post-display, .post-content {
                 font-family: 'Ubuntu', sans-serif;
                 color: white;
             }
@@ -27,20 +27,45 @@
             .content-body {
                 font-size: 1.3em;
             }
-            label {
+            a {
+                color: white;
+            }
+            a:hover {
+                color:white;
+            }
+            .post-content {
                 font-size: 1.3em;
+            }
+            .comment-textarea {
+                width: 650px !important;
+                height: 100px !important;
             }
         </style>
     </head>
     <body>
         <div class="container" >
-            <div class="main-title">Blog Portal</div>
+            <div class="main-title">
+                <a href="/blog">Blog Portal</a>
+            </div>
             <hr style="height:30px; color:white;">
             <br>
-            <div class="centered">
-                <h2>Welcome {{ username }}! </h2>
+            <div class="login-area">
+            <a class="login-link" href="/">Home</a> |
+            {% if user %}
+            <a class="login-link" href="/blog/newpost">Create a New Post</a> | {{ user.name }} (
+            <a class="login-link" href="/logout">logout</a>)
+        {% else %}
+            <a class="login-link" href="/blog/newpost">Create a New Post</a>
+                |
+            <a class="login-link" href="/login">login</a>
+            |
+                <a class="login-link" href="/signup">signup</a>
+        {% endif %}
             </div>
-           
+        <div id="blockcontent">
+            {% block content %}
+            {% endblock %}
+        </div>
         </div>
     </body>
 </html>

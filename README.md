@@ -13,9 +13,9 @@
 - Users can edit their posts and comments
 
 ### How to use this project
-- Download / Clone this project to your machine.
-- Open terminal and navigate to the project directory 
-- Install Google Cloud on your machine if you don't have it
-- Run command "dev_appserver.py ." 
-- Go to "http://localhost:8080/" using your browser and enjoy the project
+1. Download / Clone this project to your machine
+2. Open terminal and navigate to the project directory 
+3. Install Google Cloud on your machine if you don't have it
+4. Run command "   dev_appserver.py .   "
+5. Go to "http://localhost:8080/" using your browser and enjoy the project
 

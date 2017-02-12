@@ -1,37 +1,6 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Blog Portal!</title>
-        <meta charset="utf-8">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
-        <style>
-           
-            h1, h2, h3, h4, textarea, .main-title {
-                font-family: 'Ubuntu', sans-serif;
-                color: white;
-            }
-            textarea {
-                width: 650px !important;
-                height: 350px !important;
-            }
-            .main-title {
-                text-align: center;
-                font-size: 3.5em;
-            }
-            body{
-                background: #ee0979; /* fallback for old browsers */
-                background: -webkit-linear-gradient(to left, #ee0979 , #ff6a00); /* Chrome 10-25, Safari 5.1-6 */
-                background: linear-gradient(to left, #ee0979 , #ff6a00); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */    
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container" >
-            <div class="main-title">Blog Portal</div>
-            <hr>
-            <br>
-            
+{% extends "base.html" %}
+
+{% block content %}
                 <form method="post">
                     <div class="form-group">
                         <label>
@@ -53,10 +22,7 @@
                         </div>
                         {% endif %}
                         <input type="submit" value="Submit" class="btn btn-default">
+                        <button class="btn btn-primary"><a href="/" id="cancel-btn">Cancel</a></button>
                     </div>
                 </form>
-            <hr>
-            
-        </div>
-    </body>
-</html>
+{% endblock %}

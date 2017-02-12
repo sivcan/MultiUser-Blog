@@ -158,14 +158,7 @@ class Register(SignUp):
             user = User.register(self.username, self.password, self.email)
             user.put()
             self.login(user)
-            self.redirect('/welcome')
-            
-class Welcome(BlogHandler):
-    def get(self):
-        if self.user:
-            self.render('welcome.html', username = self.user.name)
-        else :
-            self.redirect('/signup')
+            self.redirect('/blog')
 
 class Login(BlogHandler):
     def get(self):
@@ -178,7 +171,7 @@ class Login(BlogHandler):
         user = User.login(username, password)
         if user:
             self.login(user)
-            self.redirect('/welcome')
+            self.redirect('/blog')
         else :
             error = "Invalid username or password!"
             self.render("login.html", error=error)
@@ -258,8 +251,8 @@ class PostPage(BlogHandler):
         if not post:
             self.error(404)
             self.render("404.html")
-        
-        self.render("link.html", post=post)
+        else:
+            self.render("link.html", post=post)
         
     def post(self, post_id):
         if not self.user:
@@ -283,13 +276,32 @@ class PostPage(BlogHandler):
             post = db.get(key)
             self.render("link.html", post=post, error=error)
 
+class DeletePost(BlogHandler):
+    def get(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        if not post:
+            self.error(404)
+            self.render('404.html')
+        else:
+            self.render("deletepost.html")
+    
+    def post(self, post_id):
+        if not self.user:
+            self.redirect('/blog')
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        post.delete()
+        self.redirect('/blog')
+        
+
 app = webapp2.WSGIApplication([
     ('/', HomeHandler),
     ('/blog/?', HomeHandler),
     ('/blog/newpost', NewPost),
     ('/blog/(\d+)', PostPage),
+    ('/blog/delete/(\d+)', DeletePost),
     ('/signup', Register),
-    ('/welcome', Welcome),
     ('/login', Login),
     ('/logout', Logout)
 ], debug=True)
