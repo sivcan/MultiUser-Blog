@@ -9,6 +9,7 @@ import re
 
 from google.appengine.ext import db
 
+
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader= jinja2.FileSystemLoader(template_dir), autoescape=True)
 
@@ -136,9 +137,10 @@ class SignUp(BlogHandler):
         elif len(self.password) < 5:
             error = "The password must be more than 5 characters!"
             haserror = True
-        elif not re.match(r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)', self.email) :
-            error = "Invalid email address"
-            haserror = True
+        elif self.email :
+            if not re.match(r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)', self.email) :
+                error = "Invalid email address"
+                haserror = True
         
         if haserror :
             self.render_front(self.username, self.email, error)
@@ -158,7 +160,7 @@ class Register(SignUp):
             user = User.register(self.username, self.password, self.email)
             user.put()
             self.login(user)
-            self.redirect('/blog')
+            return self.redirect('/blog')
 
 class Login(BlogHandler):
     def get(self):
@@ -171,7 +173,7 @@ class Login(BlogHandler):
         user = User.login(username, password)
         if user:
             self.login(user)
-            self.redirect('/blog')
+            return self.redirect('/blog')
         else :
             error = "Invalid username or password!"
             self.render("login.html", error=error)
@@ -179,7 +181,7 @@ class Login(BlogHandler):
 class Logout(BlogHandler):
     def get(self):
         self.logout()
-        self.redirect('/blog')
+        return self.redirect('/blog')
 
         
 #Blog Classes 
@@ -207,7 +209,7 @@ class HomeHandler(BlogHandler):
     
     def post(self):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/login')
         subject = self.request.get('post_id')
         
         u = User.by_name(self.user.name)
@@ -216,21 +218,23 @@ class HomeHandler(BlogHandler):
         
         key = db.Key.from_path('Post', int(subject), parent=blog_key())
         post = db.get(key)
+        if not post:
+                return self.redirect('/login')
         post.like_count += 1
         post.put()
         
-        self.redirect('/blog')
+        return self.redirect('/blog')
         
 class NewPost(BlogHandler):
     def get(self):
         if self.user:
             self.render("newpost.html")
         else:
-            self.redirect('/login')
+            return self.redirect('/login')
         
     def post(self):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/login')
         
         subject = self.request.get('subject')
         content = self.request.get('content')
@@ -238,7 +242,7 @@ class NewPost(BlogHandler):
         if subject and content :
             p = Post(parent=blog_key(), subject=subject, content=content, name=self.user.name)
             p.put()
-            self.redirect('/blog/%s' % str(p.key().id()))
+            return self.redirect('/blog/%s' % str(p.key().id()))
         else :
             error = "Enter the subject and content, please!"
             self.render("newpost.html", subject=subject, content=content, rror=error)
@@ -256,24 +260,28 @@ class PostPage(BlogHandler):
         
     def post(self, post_id):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/login')
         
         content = self.request.get('content')
         
         if content:
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
+            if not post or not self.user:
+                return self.redirect('/login')
             post.comments = post.comments + [content]
             post.put()
             
             u = User.by_name(self.user.name)
             u.user_comments = u.user_comments + [content]
             u.put()
-            self.redirect('/blog/%s' % post_id)
+            return self.redirect('/blog/%s' % post_id)
         else :
             error = "Enter content, please!"
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
+            if not post:
+                return self.redirect('/login')
             self.render("link.html", post=post, error=error)
 
 class DeletePost(BlogHandler):
@@ -288,11 +296,13 @@ class DeletePost(BlogHandler):
     
     def post(self, post_id):
         if not self.user:
-            self.redirect('/blog')
+            return self.redirect('/blog')
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
+        if not post or post.name != self.user.name :
+                return self.redirect('/login')
         post.delete()
-        self.redirect('/blog')
+        return self.redirect('/blog')
         
 class EditPost(BlogHandler):
     def get(self, post_id):
@@ -314,6 +324,8 @@ class EditPost(BlogHandler):
         if subject and content:
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
+            if not post or post.name != self.user.name :
+                return self.redirect('/login')
             post.subject = subject
             post.content = content
             post.put()
@@ -327,30 +339,34 @@ class EditComment(BlogHandler):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
         comment = self.request.get('comment')
-        if not post:
+        if not post or not comment:
             return self.render('404.html')
         else :
             self.render('editcomment.html', post=post, comment=comment)
     
     def post(self, post_id):
         if not self.user:
-            self.redirect('/blog/%s' % post_id)
+            return self.redirect('/blog/%s' % post_id)
         
         old_comment = self.request.get('old_comment')
         comment = self.request.get('new_comment')
         if comment and old_comment:
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
+            if not post :
+                return self.redirect('/login')
             post.comments = [words.replace(old_comment, comment) for words in post.comments]
             post.put()
             
+            if not self.user:
+                    return self.redirect('/login')
             user = User.by_name(self.user.name)
             user.user_comments = [words.replace(old_comment, comment) for words in user.user_comments]
             user.put()
             
-            self.redirect('/blog/%s' % post_id)
+            return self.redirect('/blog/%s' % post_id)
         else :
-            self.redirect('/blog/%s' % post_id)
+            return self.redirect('/blog/%s' % post_id)
             
         
 class DeleteComment(BlogHandler):
@@ -358,29 +374,33 @@ class DeleteComment(BlogHandler):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
         comment = self.request.get('comment')
-        if not post:
+        if not post or not comment:
             self.render('404.html')
         else :
             self.render('deletecomment.html', post=post, comment=comment)
     
     def post(self, post_id):
         if not self.user:
-            self.redirect('/blog/%s' % post_id)
+            return self.redirect('/blog/%s' % post_id)
         
         old_comment = self.request.get('old_comment')
         if old_comment :
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
+            if not post :
+                return self.redirect('/login')
             try :
                 post.comments.remove(old_comment)
                 post.put()
                 
+                if not self.user:
+                    return self.redirect('/login')
                 user = User.by_name(self.user.name)
                 user.user_comments.remove(old_comment)
                 user.put()
             except :
-                self.redirect('/blog/%s' % post_id)
-        self.redirect('/blog/%s' % post_id)
+                return self.redirect('/blog/%s' % post_id)
+        return self.redirect('/blog/%s' % post_id)
         
 app = webapp2.WSGIApplication([
     ('/', HomeHandler),
