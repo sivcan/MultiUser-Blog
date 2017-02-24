@@ -25,3 +25,7 @@
 ```
 5. Go to " http://localhost:8080/ " using your browser and enjoy the project.
 
+### Screenshots 
+![main-page-screenshot](https://github.com/sivcan/MultiUser-Blog/blob/master/screenshots/1.png)
+
+![post-page-screenshot](https://github.com/sivcan/MultiUser-Blog/blob/master/screenshots/2.png)
